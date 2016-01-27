@@ -11,7 +11,6 @@ import com.alexecollins.docker.orchestration.model.LogPattern;
 import com.alexecollins.docker.orchestration.model.VolumeFrom;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.DockerException;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.BuildImageCmd;
 import com.github.dockerjava.api.command.CopyFileFromContainerCmd;
@@ -28,6 +27,7 @@ import com.github.dockerjava.api.command.SaveImageCmd;
 import com.github.dockerjava.api.command.StartContainerCmd;
 import com.github.dockerjava.api.command.StopContainerCmd;
 import com.github.dockerjava.api.command.TagImageCmd;
+import com.github.dockerjava.api.exception.DockerException;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Container;
@@ -35,6 +35,7 @@ import com.github.dockerjava.api.model.ContainerConfig;
 import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.Identifier;
 import com.github.dockerjava.api.model.Image;
+import com.github.dockerjava.api.model.NetworkSettings;
 import com.github.dockerjava.api.model.PushResponseItem;
 import com.github.dockerjava.api.model.Repository;
 import com.github.dockerjava.api.model.StreamType;
@@ -125,7 +126,7 @@ public class DockerOrchestratorTest {
     @Mock
     private InspectContainerResponse containerInspectResponseMock;
     @Mock
-    private InspectContainerResponse.NetworkSettings networkSettingsMock;
+    private NetworkSettings networkSettingsMock;
     @Mock
     private BuildImageCmd buildImageCmdMock;
     @Mock
@@ -253,7 +254,7 @@ public class DockerOrchestratorTest {
         when(dockerMock.stopContainerCmd(CONTAINER_ID)).thenReturn(stopContainerCmdMock);
         when(dockerMock.removeContainerCmd(CONTAINER_ID)).thenReturn(removeContainerCmdMock);
         when(dockerMock.listImagesCmd()).thenReturn(listImagesCmdMock);
-        when(removeContainerCmdMock.withForce()).thenReturn(removeContainerCmdMock);
+        when(removeContainerCmdMock.withForce(true)).thenReturn(removeContainerCmdMock);
         when(removeContainerCmdMock.withRemoveVolumes(true)).thenReturn(removeContainerCmdMock);
 
         when(listImagesCmdMock.exec()).thenReturn(Collections.singletonList(imageMock));
@@ -601,11 +602,11 @@ public class DockerOrchestratorTest {
     private LogContainerCmd mockLogContainerCmd(final String containerOutput) {
         final LogContainerCmd cmd = mock(LogContainerCmd.class);
 
-        when(cmd.withStdErr()).thenReturn(cmd);
-        when(cmd.withStdOut()).thenReturn(cmd);
+        when(cmd.withStdErr(true)).thenReturn(cmd);
+        when(cmd.withStdOut(true)).thenReturn(cmd);
         when(cmd.withTailAll()).thenReturn(cmd);
-        when(cmd.withFollowStream()).thenReturn(cmd);
-        when(cmd.withTimestamps()).thenReturn(cmd);
+        when(cmd.withFollowStream(true)).thenReturn(cmd);
+        when(cmd.withTimestamps(true)).thenReturn(cmd);
 
         when(cmd.exec(any(ResultCallback.class))).thenAnswer(
                 new Answer<Object>() {
