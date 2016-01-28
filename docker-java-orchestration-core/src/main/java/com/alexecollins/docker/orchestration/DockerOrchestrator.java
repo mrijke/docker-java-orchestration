@@ -216,6 +216,11 @@ public class DockerOrchestrator {
             return item.getError();
         }
 
+        if (item.getAux() != null) {
+            final ResponseItem.AuxDetail aux = item.getAux();
+            return String.format("%s: digest: %s size: %s", aux.getTag(), aux.getDigest(), aux.getSize());
+        }
+
         return item.toString();
     }
 
